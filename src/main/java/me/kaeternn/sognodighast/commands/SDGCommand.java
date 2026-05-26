@@ -28,7 +28,7 @@ public class SDGCommand implements BasicCommand  {
     @Override
     public List<String> suggest(CommandSourceStack source, String[] args) {
         switch (args.length) {
-            case 1:
+            case 0:
                 return List.of("reload", "version");
             default:
                 return List.of();
