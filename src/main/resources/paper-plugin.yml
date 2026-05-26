@@ -7,10 +7,9 @@ contributors: []
 depend: []
 softdepend: []
 commands:
-  sognodighast:
+  sdg:
     description: "General commands of SognoDiGhast"
-    usage: "/sognodighast [version|reload]"
-    aliases: [sdg]
+    usage: "/sdg [version|reload]"
     permission: sognodighast.admin
     permission-message: You do not have <permission>
 permissions:

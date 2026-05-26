@@ -23,7 +23,7 @@ public class SognoDiGhast extends JavaPlugin {
 
         loadConfig();
         getServer().getPluginManager().registerEvents(new SDGListener(plugin), plugin);
-        registerCommand("sognodighast", new SDGCommand(plugin));
+        registerCommand("sdg", new SDGCommand(plugin));
     }
 
     public void loadConfig() {
