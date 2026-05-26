@@ -1,0 +1,20 @@
+name: "SognoDiGhast"
+version: "1.0.0"
+main: "me.kaeternn.sognodighast.SognoDiGhast"
+api-version: "1.21"
+authors: [Kaeternn]
+contributors: []
+depend: []
+softdepend: []
+commands:
+  sognodighast:
+    description: "General commands of SognoDiGhast"
+    usage: "/sognodighast [version|reload]"
+    aliases: [sdg]
+    permission: sognodighast.admin
+    permission-message: You do not have <permission>
+permissions:
+  sognodighast.admin:
+    description: "Allows the player to use /sognodighast command."
+    default: op
+
