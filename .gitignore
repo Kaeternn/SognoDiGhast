@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -19,18 +19,20 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Virtual Machine
 hs_err_pid*
 replay_pid*
 
-# Github
-.github/
-
 # Gradle
+!gradle/wrapper/gradle-wrapper.jar
 .gradle/
-bin/
 build/
-run/
+.kotlin
 
-# VsCode
+# IDE
+.idea/
 .vscode/
+*.iml
+.classpath
+.project
+.settings/

@@ -1,0 +1,35 @@
+plugins {
+    `java-library`
+}
+
+group = "me.kaeternn"
+version = "1.1.0"
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.release = 25
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
