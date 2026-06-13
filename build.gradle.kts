@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "me.kaeternn"
-version = "1.1.0"
+version = project.property("projectVersion")!!
 
 repositories {
     mavenCentral()
@@ -32,4 +32,16 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+tasks.processResources {
+    val projectVersion = project.property("projectVersion")
+    inputs.property("projectVersion", projectVersion)
+    filesMatching("paper-plugin.yml") {
+        expand(mapOf("projectVersion" to projectVersion))
+    }
+}
+
+tasks.jar {
+    archiveBaseName = "SognoDiGhast"
 }

@@ -1,5 +1,5 @@
 name: "SognoDiGhast"
-version: "1.0.0"
+version: "${projectVersion}"
 main: "me.kaeternn.sognodighast.SognoDiGhast"
 api-version: "1.21"
 authors: [Kaeternn]
