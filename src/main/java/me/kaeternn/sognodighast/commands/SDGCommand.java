@@ -1,5 +1,6 @@
 package me.kaeternn.sognodighast.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.papermc.paper.command.brigadier.BasicCommand;
@@ -27,9 +28,20 @@ public class SDGCommand implements BasicCommand  {
 
     @Override
     public List<String> suggest(CommandSourceStack source, String[] args) {
+
+        List<String> options = List.of("reload", "version");
+
         switch (args.length) {
             case 0:
-                return List.of("reload", "version");
+                return options;
+            case 1:
+                String prefix = args[0];
+                List<String> fetchedOptions = new ArrayList<>();
+
+                for (String option : options)
+                    if (option.startsWith(prefix)) fetchedOptions.add(option);
+
+                return fetchedOptions;
             default:
                 return List.of();
         }

@@ -17,13 +17,9 @@ import me.kaeternn.sognodighast.entities.SDGWorld;
 
 public class SDGListener implements Listener {
     private SognoDiGhast plugin;
-    private boolean onlyWhenRidden;
-    private boolean onlyHappyGhast;
     
     public SDGListener(SognoDiGhast plugin) {
         this.plugin = plugin;
-        this.onlyWhenRidden = plugin.onlyWhenRidden;
-        this.onlyHappyGhast = plugin.onlyHappyGhast;
 
         if (plugin.debug) plugin.getLogger().info("Listener registered.");
     }
@@ -35,9 +31,9 @@ public class SDGListener implements Listener {
 
         switch (event.getEntityType()) {
             case GHAST:
-                if (onlyHappyGhast) forceRemove = true; // IF modifier only applied on Happy Ghast
+                if (plugin.onlyHappyGhast) forceRemove = true; // IF modifier only applied on Happy Ghast
             case HAPPY_GHAST:
-                if (onlyWhenRidden) forceRemove = true; //IF modifier only applied on ridden Happy Ghast
+                if (plugin.onlyWhenRidden) forceRemove = true; //IF modifier only applied on ridden Happy Ghast
                 break;
             default:
                 return;
@@ -54,7 +50,7 @@ public class SDGListener implements Listener {
 
         switch (event.getPlayer().getVehicle().getType()) {
             case GHAST:
-                if (onlyHappyGhast) forceRemove = true; // IF modifier only applied on Happy Ghast
+                if (plugin.onlyHappyGhast) forceRemove = true; // IF modifier only applied on Happy Ghast
             case HAPPY_GHAST:
                 break;
             default:
@@ -66,8 +62,8 @@ public class SDGListener implements Listener {
 
     public void GhastHandler(LivingEntity ghast, boolean forceRemove) {
         AttributeInstance flyingSpeedAttribute = ghast.getAttribute(Attribute.FLYING_SPEED);
-        Integer min = -2; // -2 mean undified, -1 mean no limit
-        Integer max = -2;
+        Integer min = null;
+        Integer max = null;
 
         Location ghastLocation = ghast.getLocation();
         SDGWorld ghastWorld = plugin.toSDGWorld(ghastLocation.getWorld());
@@ -83,8 +79,18 @@ public class SDGListener implements Listener {
         }
 
         if (flyingSpeedAttribute.getModifier(plugin.legacyKey) != null) flyingSpeedAttribute.removeModifier(plugin.legacyKey);
-        if (!forceRemove && ((min != -1 || ghastLocation.getBlockY() >= min) // IF forceRemove false OR min isn't limited OR ghast above min limit
-                && (max != -1 || ghastLocation.getBlockY() <= max))) { // AND max isn't limited OR ghast below max limit
+
+        boolean isInMinLimit = false;
+        boolean isInMaxLimit = false;
+        if (!forceRemove){ // IF forceRemove disabled
+            if (min == null) isInMinLimit = true; // IF min limit disabled or respected
+            else if (ghastLocation.getBlockY() >= min) isInMinLimit = true;
+
+            if (max == null) isInMaxLimit = true; // IF max limit disabled or respected
+            else if (ghastLocation.getBlockY() <= max) isInMaxLimit = true;
+        }
+
+        if (isInMinLimit && isInMaxLimit) {
             if (flyingSpeedAttribute.getModifier(plugin.key) == null) { // IF ghast don't have the modifier
                 flyingSpeedAttribute.addModifier(plugin.modifier);
 

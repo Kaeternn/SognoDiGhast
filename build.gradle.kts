@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = "me.kaeternn"
@@ -15,8 +16,6 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
@@ -40,8 +39,17 @@ tasks.processResources {
     filesMatching("paper-plugin.yml") {
         expand(mapOf("projectVersion" to projectVersion))
     }
+    filesMatching("config.yml") {
+        expand(mapOf("projectVersion" to projectVersion))
+    }
 }
 
 tasks.jar {
     archiveBaseName = "SognoDiGhast"
+}
+
+tasks {
+    runServer {
+        minecraftVersion("26.1.2")
+    }
 }

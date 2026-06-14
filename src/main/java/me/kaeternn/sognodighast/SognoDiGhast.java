@@ -1,5 +1,7 @@
 package me.kaeternn.sognodighast;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +37,43 @@ public class SognoDiGhast extends JavaPlugin {
         key = new NamespacedKey(plugin, "FlyingSpeedModifier");
         legacyKey = new NamespacedKey(plugin, "HappyGhastSpeedModifier");
 
+        updateConfig();
         loadConfig();
+
         getServer().getPluginManager().registerEvents(new SDGListener(plugin), plugin);
         registerCommand("sdg", new SDGCommand(plugin));
+    }
+
+    private void updateConfig() {
+        switch (getConfig().getString("version", "1.0.0")) {
+            case "1.0.0":
+                boolean oldDebug = getConfig().getBoolean("debug");;
+                double oldSpeedMultiplier = getConfig().getDouble("speed_multiplier");
+                int oldMinHeight = getConfig().getInt("min_height");
+
+                Path config = getDataFolder().toPath().resolve("config.yml");
+                try {
+                    Files.deleteIfExists(config);
+                } catch (Exception e) {
+                    getLogger().severe("Error while updating configuration : " + e.getMessage());
+                }
+                saveDefaultConfig();
+                reloadConfig();
+
+                getConfig().set("debug", oldDebug);
+                getConfig().set("speed_multiplier", oldSpeedMultiplier);
+
+                ConfigurationSection dimensionsSection = getConfig().getConfigurationSection("dimensions");
+                for (String key : dimensionsSection.getKeys(false))
+                    dimensionsSection.getConfigurationSection(key).set("min", oldMinHeight);
+
+                if (debug) getLogger().info("Configuration updated from 1.0.0 to " + getPluginMeta().getVersion() + ".");
+                break;
+            default:
+                break;
+        }
+        
+        saveConfig();
     }
 
     public void loadConfig() {
@@ -47,10 +83,14 @@ public class SognoDiGhast extends JavaPlugin {
         if (debug) getLogger().info("Debug mode enabled.");
         
         onlyWhenRidden = getConfig().getBoolean("only_when_ridden");
-        if (debug) getLogger().info("Modifier only applied on ridden ghasts.");
+        if (debug)
+            if (onlyWhenRidden) getLogger().info("Modifier only applied to ridden ghasts.");
+            else getLogger().info("Modifier applied to not ridden ghasts.");
 
         onlyHappyGhast = getConfig().getBoolean("only_happy_ghast");
-        if (debug) getLogger().info("Modifier only applied on happy ghasts.");
+        if (debug) 
+            if (onlyHappyGhast) getLogger().info("Modifier only applied to happy ghasts.");
+            else getLogger().info("Modifier applied to all ghasts.");
 
         modifier = new AttributeModifier(key, getConfig().getDouble("speed_multiplier") - 1.0, Operation.MULTIPLY_SCALAR_1);
         legacyModifier = new AttributeModifier(legacyKey, getConfig().getDouble("speed_multiplier") - 1.0, Operation.MULTIPLY_SCALAR_1);
@@ -58,7 +98,7 @@ public class SognoDiGhast extends JavaPlugin {
 
         ConfigurationSection dimensionsSection = getConfig().getConfigurationSection("dimensions");
         if (dimensionsSection == null) {
-            getLogger().severe("No dimensions defined in config, it will be regenerated.");
+            getLogger().severe("No dimensions defined in config.");
         } else {
             for (String key : dimensionsSection.getKeys(false)) {
                 Environment dimension;
@@ -74,7 +114,8 @@ public class SognoDiGhast extends JavaPlugin {
                         dimension = Environment.THE_END;
                         break;
                     default:
-                        getLogger().severe("Dimension " + key + " not found don't add new dimension, use world configuration instead.");
+                        getLogger().severe("Dimension " + key + " not found, don't add new dimension use worlds settings instead, it has been deleted.");
+                        dimensionsSection.set(key, null);
                         continue;
                 }
 
@@ -85,7 +126,11 @@ public class SognoDiGhast extends JavaPlugin {
                 SDGEnvironment newDimension = new SDGEnvironment(dimension, values[0], values[1]);
 
                 environments.add(newDimension);
-                if (debug) getLogger().info("Dimension " + key + " added with min height " + dimensionSection.getInt("min") + " and max height " + dimensionSection.getInt("max") + ".");
+                if (debug) {
+                    getLogger().info("Dimension " + key + " added :"
+                    + "\n - Min height, " + (values[0] != null ? "" + values[0] : "infinity")
+                    + "\n - Max height, " + (values[1] != null ? "" + values[1] : "infinity"));
+                }
             }
         }
 
@@ -107,7 +152,11 @@ public class SognoDiGhast extends JavaPlugin {
                 SDGWorld newWorld = new SDGWorld(world, values[0], values[1]);
 
                 worlds.add(newWorld);
-                if (debug) getLogger().info("World " + key + " added with min height " + worldSection.getInt("min") + " and max height " + worldSection.getInt("max") + ".");
+                if (debug) {
+                    getLogger().info("World " + key + " added :"
+                    + "\n - Min height, " + (values[0] != null ? "" + values[0] : "infinity")
+                    + "\n - Max height, " + (values[1] != null ? "" + values[1] : "infinity"));
+                }
             }
         }
 
@@ -117,14 +166,14 @@ public class SognoDiGhast extends JavaPlugin {
     private Integer[] getLimitValues(ConfigurationSection section) {
         Integer min = null;
         if (section.getString("min").matches("-?\\d+")) min = section.getInt("min");
-        else if (section.getString("min") != "infinity") {
+        else if (!section.getString("min").equalsIgnoreCase("infinity")) {
             section.set("min", "infinity");
             getLogger().severe("Invalid value for min height, it was changed to \"infinity\"");
         }
 
         Integer max = null;
         if (section.getString("max").matches("-?\\d+")) max = section.getInt("max");
-        else if (section.getString("max") != "infinity") {
+        else if (!section.getString("max").equalsIgnoreCase("infinity")) {
             section.set("max", "infinity");
             getLogger().severe("Invalid value for max height, it was changed to \"infinity\"");
         }

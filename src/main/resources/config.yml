@@ -1,7 +1,7 @@
+version: ${projectVersion} # Never change this
 debug: false # Turn this to true if you need debuging information only
-# If somehow you server allow player to ride regular ghast, the only_when_ridden option will apply to them too
-only_when_ridden: false # If true, happy ghasts will get faster only when a player ride it
 only_happy_ghast: true # If true, regular ghasts won't get faster
+only_when_ridden: false # If true, happy ghasts will get faster only when a player ride it and overwrite only_happy_ghast
 speed_multiplier: 2.0 # Flying speed multiplier
 dimensions: # If you want to disabling a min or max limit put it to "infinity"
   overworld:
@@ -13,4 +13,4 @@ dimensions: # If you want to disabling a min or max limit put it to "infinity"
   end:
     min: 150
     max: infinity
-worlds: # Overwrite dimension's value if setted, write it like dimensions entry but with world name
+worlds: {} # Overwrite dimension's value if setted, write it like dimensions entry but with world name
