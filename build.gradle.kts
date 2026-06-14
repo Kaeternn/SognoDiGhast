@@ -50,6 +50,12 @@ tasks.jar {
 
 tasks {
     runServer {
+        //minecraftVersion("1.21.6")
+        //minecraftVersion("1.21.7")
+        //minecraftVersion("1.21.8")
+        //minecraftVersion("1.21.9")
+        //minecraftVersion("1.21.10")
+        //minecraftVersion("1.21.11")
         minecraftVersion("26.1.2")
     }
 }

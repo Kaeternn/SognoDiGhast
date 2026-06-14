@@ -78,6 +78,8 @@ public class SognoDiGhast extends JavaPlugin {
 
     public void loadConfig() {
         reloadConfig();
+        environments.clear();
+        worlds.clear();
 
         debug = getConfig().getBoolean("debug");
         if (debug) getLogger().info("Debug mode enabled.");
