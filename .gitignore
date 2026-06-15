@@ -29,6 +29,8 @@ replay_pid*
 build/
 .kotlin
 run/
+bin/
+icone.png
 
 # IDE
 .idea/
