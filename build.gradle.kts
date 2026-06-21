@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 }
 
 java {
@@ -56,6 +56,7 @@ tasks {
         //minecraftVersion("1.21.9")
         //minecraftVersion("1.21.10")
         //minecraftVersion("1.21.11")
-        minecraftVersion("26.1.2")
+        //minecraftVersion("26.1.2")
+        minecraftVersion("26.2")
     }
 }
