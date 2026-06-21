@@ -1,5 +1,5 @@
 # SognoDiGhast - by Kaeternn
-A simple yet configurable plugin to boost happy ghast speed.
+A simple yet configurable plugin to boost regular and happy ghasts speed.
 ## Installation
 This plugin requires [Paper](https://papermc.io/downloads/paper).
 
@@ -32,6 +32,8 @@ Just let your players fly away with their faster ghasts.
 There are two admin commands too :
 - ``/sdg version`` tells you which version is installed on your server.
 - ``/sdg reload`` reload the configuration if you want to update values without restarting the server.
+## Permissions
+- ``sognodighast.admin`` give access to ``/sdg`` command.
 ## Getting help
 Need help or want to make a suggestion ? Join my [Discord](https://discord.com/invite/sPX8AMxbBG) !
 ## Information
