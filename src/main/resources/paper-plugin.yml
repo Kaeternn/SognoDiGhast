@@ -9,9 +9,9 @@ softdepend: []
 commands:
   sdg:
     description: "General commands of SognoDiGhast"
-    usage: "/sdg [version|reload]"
+    usage: "/sdg [reload|version]"
     permission: sognodighast.admin
-    permission-message: You do not have <permission>
+    permission-message: 
 permissions:
   sognodighast.admin:
     description: "Allows the player to use /sognodighast command."

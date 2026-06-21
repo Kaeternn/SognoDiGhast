@@ -45,7 +45,7 @@ tasks.processResources {
 }
 
 tasks.jar {
-    archiveBaseName = "SognoDiGhast"
+    archiveBaseName.set(rootProject.name)
 }
 
 tasks {

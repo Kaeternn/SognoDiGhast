@@ -15,6 +15,11 @@ public class SDGCommand implements BasicCommand  {
 
     @Override
     public void execute(CommandSourceStack source, String[] args) {
+        if (args.length == 0) {
+            source.getSender().sendMessage("Usage : /sdg [reload/version]");
+            return;
+        }
+
         switch (args[0]) {
             case "reload":
                 plugin.loadConfig();
@@ -45,5 +50,10 @@ public class SDGCommand implements BasicCommand  {
             default:
                 return List.of();
         }
+    }
+    
+    @Override
+    public String permission() {
+        return "sognodighast.admin";
     }
 }
