@@ -73,7 +73,7 @@ public class SognoDiGhast extends JavaPlugin {
                 break;
             case "1.1.0":
             case "1.1.1":
-                getConfig().set("version", "1.2.0");
+                getConfig().set("version", getPluginMeta().getVersion());
 
                 if (getConfig().getBoolean("debug")) getLogger().info("Configuration updated from 1.1.X to " + getPluginMeta().getVersion() + ".");
                 break;
