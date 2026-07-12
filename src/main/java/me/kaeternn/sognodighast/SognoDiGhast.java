@@ -2,6 +2,7 @@ package me.kaeternn.sognodighast;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,18 +14,18 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import me.kaeternn.sognodighast.commands.*;
 import me.kaeternn.sognodighast.entities.*;
+import me.kaeternn.sognodighast.handlers.*;
 import me.kaeternn.sognodighast.listeners.*;
 
 public class SognoDiGhast extends JavaPlugin {
     public static SognoDiGhast plugin;
     public NamespacedKey key;
     public NamespacedKey legacyKey;
-    public boolean debug;
-    public boolean onlyWhenRidden;
-    public boolean onlyHappyGhast;
+    public SDGConfig cachedConfig;
     public AttributeModifier modifier;
     public AttributeModifier legacyModifier;
     private List<SDGEnvironment> environments = new ArrayList<>();
@@ -42,12 +43,13 @@ public class SognoDiGhast extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new SDGListener(plugin), plugin);
         registerCommand("sdg", new SDGCommand(plugin));
+        SDGDialogHandler.plugin = plugin;
     }
 
     private void updateConfig() {
         switch (getConfig().getString("version", "1.0.0")) {
             case "1.0.0":
-                boolean oldDebug = getConfig().getBoolean("debug");;
+                boolean oldDebug = getConfig().getBoolean("debug");
                 double oldSpeedMultiplier = getConfig().getDouble("speed_multiplier");
                 int oldMinHeight = getConfig().getInt("min_height");
 
@@ -67,7 +69,13 @@ public class SognoDiGhast extends JavaPlugin {
                 for (String key : dimensionsSection.getKeys(false))
                     dimensionsSection.getConfigurationSection(key).set("min", oldMinHeight);
 
-                if (debug) getLogger().info("Configuration updated from 1.0.0 to " + getPluginMeta().getVersion() + ".");
+                if (getConfig().getBoolean("debug")) getLogger().info("Configuration updated from 1.0.0 to " + getPluginMeta().getVersion() + ".");
+                break;
+            case "1.1.0":
+            case "1.1.1":
+                getConfig().set("version", getPluginMeta().getVersion());
+
+                if (getConfig().getBoolean("debug")) getLogger().info("Configuration updated from 1.1.X to " + getPluginMeta().getVersion() + ".");
                 break;
             default:
                 break;
@@ -81,22 +89,23 @@ public class SognoDiGhast extends JavaPlugin {
         environments.clear();
         worlds.clear();
 
-        debug = getConfig().getBoolean("debug");
+        boolean debug = getConfig().getBoolean("debug");
         if (debug) getLogger().info("Debug mode enabled.");
         
-        onlyWhenRidden = getConfig().getBoolean("only_when_ridden");
+        boolean onlyWhenRidden = getConfig().getBoolean("only_when_ridden");
         if (debug)
             if (onlyWhenRidden) getLogger().info("Modifier only applied to ridden ghasts.");
             else getLogger().info("Modifier applied to not ridden ghasts.");
 
-        onlyHappyGhast = getConfig().getBoolean("only_happy_ghast");
+        boolean onlyHappyGhast = getConfig().getBoolean("only_happy_ghast");
         if (debug) 
             if (onlyHappyGhast) getLogger().info("Modifier only applied to happy ghasts.");
             else getLogger().info("Modifier applied to all ghasts.");
 
-        modifier = new AttributeModifier(key, getConfig().getDouble("speed_multiplier") - 1.0, Operation.MULTIPLY_SCALAR_1);
-        legacyModifier = new AttributeModifier(legacyKey, getConfig().getDouble("speed_multiplier") - 1.0, Operation.MULTIPLY_SCALAR_1);
-        if (debug) getLogger().info("Flying speed multiplier set to " + getConfig().getDouble("speed_multiplier") + ".");
+        Double speedMultiplier = getConfig().getDouble("speed_multiplier");
+        modifier = new AttributeModifier(key, speedMultiplier - 1.0, Operation.MULTIPLY_SCALAR_1);
+        legacyModifier = new AttributeModifier(legacyKey, speedMultiplier - 1.0, Operation.MULTIPLY_SCALAR_1);
+        if (debug) getLogger().info("Flying speed multiplier set to " + speedMultiplier + ".");
 
         ConfigurationSection dimensionsSection = getConfig().getConfigurationSection("dimensions");
         if (dimensionsSection == null) {
@@ -162,10 +171,61 @@ public class SognoDiGhast extends JavaPlugin {
             }
         }
 
+        this.cachedConfig = new SDGConfig(debug, onlyWhenRidden, onlyHappyGhast, speedMultiplier);
+
         saveConfig();
     }
 
-    private Integer[] getLimitValues(ConfigurationSection section) {
+    public void setConfig(@NotNull SDGConfig newConfig) {
+        getConfig().set("debug", newConfig.isDebugEnabled());
+        getConfig().set("only_when_ridden", newConfig.isOnlyWhenRidden());
+        getConfig().set("only_happy_ghast", newConfig.isOnlyHappyGhast());
+        getConfig().set("speed_multiplier", newConfig.getSpeedMultiplier());
+
+        saveConfig();
+        loadConfig();
+    }
+
+    public void setEnvironment(@NotNull SDGEnvironment newEnvironment) {
+        String environmentName = null;
+
+        switch (newEnvironment.getEnvironment()) {
+            case NORMAL:
+                environmentName = "overworld";
+                break;
+            case NETHER:
+                environmentName = "nether";
+                break;
+            case THE_END:
+                environmentName = "end";
+                break;
+            default:
+                break;
+        }
+
+        if (environmentName == null) {
+            getLogger().severe("Dimension " + newEnvironment.getEnvironment() + " : Error while trying to set this dimension's configuration, please report this error as a bug.");
+            return;
+        }   
+
+        ConfigurationSection dimensionsSection = getConfig().getConfigurationSection("dimensions");
+        dimensionsSection.set(environmentName + ".min", newEnvironment.getMin() != null ? newEnvironment.getMin() : "infinity");
+        dimensionsSection.set(environmentName + ".max", newEnvironment.getMax() != null ? newEnvironment.getMax() : "infinity");
+
+        saveConfig();
+        loadConfig();
+    }
+
+    public void setWorld(@NotNull SDGWorld newWorld) {
+        ConfigurationSection worldsSection = getConfig().getConfigurationSection("worlds");
+        worldsSection.set(newWorld.getWorld().getName() + ".min", newWorld.getMin() != null ? newWorld.getMin() : "infinity");
+        worldsSection.set(newWorld.getWorld().getName() + ".max", newWorld.getMax() != null ? newWorld.getMax() : "infinity");
+
+        saveConfig();
+        loadConfig();
+    }
+
+    private Integer[] getLimitValues(@NotNull ConfigurationSection section) {
         Integer min = null;
         if (section.getString("min").matches("-?\\d+")) min = section.getInt("min");
         else if (!section.getString("min").equalsIgnoreCase("infinity")) {
@@ -183,14 +243,14 @@ public class SognoDiGhast extends JavaPlugin {
         return new Integer[] { min, max };
     }
 
-    public SDGEnvironment toSDGEnvironment(Environment toConvertEnvironment) {
+    public SDGEnvironment toSDGEnvironment(@NotNull Environment toConvertEnvironment) {
         for (SDGEnvironment environment : environments)
             if (environment.getEnvironment().equals(toConvertEnvironment)) return environment;
         
         return null;
     }
 
-    public SDGWorld toSDGWorld(World toConvertWorld) {
+    public SDGWorld toSDGWorld(@NotNull World toConvertWorld) {
         for (SDGWorld world : worlds)
             if (world.getWorld().equals(toConvertWorld)) return world;
         

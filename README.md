@@ -29,9 +29,13 @@ If you want to disable one of these limit, set it to infinity.
 ## Usage
 Just let your players fly away with their faster ghasts.
 
-There are two admin commands too :
+There are three admin commands too :
 - ``/sdg version`` tells you which version is installed on your server.
 - ``/sdg reload`` reload the configuration if you want to update values without restarting the server.
+- ``/sdg menu``
+  - ``general`` open the general configuration UI.
+  - ``dimension [overworld|nether|end]`` open the specified dimension configuration UI.
+  - ``world [world name]`` open the specified world configuration UI.
 ## Permissions
 - ``sognodighast.admin`` give access to ``/sdg`` command.
 ## Getting help
