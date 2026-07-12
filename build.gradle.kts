@@ -57,6 +57,6 @@ tasks {
         //minecraftVersion("1.21.10")
         //minecraftVersion("1.21.11")
         //minecraftVersion("26.1.2")
-        minecraftVersion("26.2")
+        //minecraftVersion("26.2")
     }
 }

@@ -9,7 +9,7 @@ softdepend: []
 commands:
   sdg:
     description: "General commands of SognoDiGhast"
-    usage: "/sdg [reload|version]"
+    usage: "/sdg [menu [general|dimension|world]|reload|version]"
     permission: sognodighast.admin
     permission-message: 
 permissions:
